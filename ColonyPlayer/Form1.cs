@@ -1,5 +1,4 @@
-﻿using AxShockwaveFlashObjects;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,6 +34,8 @@ namespace ColonyPlayer
         // Program opens!
         public Form1()
         {
+            this.Activated += new EventHandler(Form1_Activated);
+
             // We try to remove old file on startup, if it exists
             try
             {
@@ -62,7 +63,7 @@ namespace ColonyPlayer
                 WebClient wClient = new WebClient();
                 string programVersion = wClient.DownloadString("https://raw.githubusercontent.com/SynthKittenDev/Colony-Player/main/programVersion");
                 string removeNumberVersion = new String(programVersion.Where(Char.IsDigit).ToArray());
-                if (removeNumberVersion != "110")
+                if (removeNumberVersion != "127")
                 {
                     var result = MessageBox.Show("An update is available for Colony Player! Would you like to update?", "Auto Updater", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                     if (result == DialogResult.Yes)
@@ -125,7 +126,6 @@ namespace ColonyPlayer
                 MessageBox.Show(ex.Message);
                 System.Windows.Forms.Application.Exit();
             }
-
             // We try to check if Flash10t.ocx is registered or not.. (required for program + game to run)
             try
             {
@@ -158,8 +158,8 @@ namespace ColonyPlayer
             // If there's an error, it's normel on first run. Restert epplicetion.
             catch
             {
-                Application.Restart();
                 this.Close();
+                System.Windows.Forms.Application.Exit();
             }
         }
 
