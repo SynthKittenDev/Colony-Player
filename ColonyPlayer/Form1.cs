@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,6 +36,47 @@ namespace ColonyPlayer
         {
             this.Activated += new EventHandler(Form1_Activated);
 
+            // We create a security allowance to Flash Player in the current directory, so the game will run without issue
+            try
+            {
+                // We get the directory to where Flash Player checks for paths where SWFs are allowed to be ran
+                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string flashPlayerTrustPath = Path.Combine(appDataPath, "Macromedia", "Flash Player", "#Security", "FlashPlayerTrust");
+
+                // Ensure the directory exists
+                if (!Directory.Exists(flashPlayerTrustPath))
+                {
+                    Directory.CreateDirectory(flashPlayerTrustPath);
+                }
+
+                string configFilePath = Path.Combine(flashPlayerTrustPath, "winetrust.cfg");
+
+                // Ensure the file exists
+                if (!File.Exists(configFilePath))
+                {
+                    File.Create(configFilePath).Dispose();
+                }
+
+                // Get the current directory
+                string currentDirectory = Directory.GetCurrentDirectory();
+
+                // Read the file contents
+                var lines = File.ReadAllLines(configFilePath).ToList();
+
+                // Check if the current directory is already in the file
+                if (!lines.Contains(currentDirectory))
+                {
+                    // Append the current directory to the file
+                    lines.Add(currentDirectory);
+                    File.WriteAllLines(configFilePath, lines);
+                }
+                // Done! Now the file should work without issue (ignoring AVs misflagging)
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message); // Show error if there was one
+            }
+
             // We try to remove old file on startup, if it exists
             try
             {
@@ -61,9 +102,9 @@ namespace ColonyPlayer
             try
             {
                 WebClient wClient = new WebClient();
-                string programVersion = wClient.DownloadString("https://raw.githubusercontent.com/SynthKittenDev/Colony-Player/main/programVersion");
+                string programVersion = wClient.DownloadString("https://raw.githubusercontent.com/SynthKittenDev/Colony-Player/main/programVersion"); // We check the program version from github to see if it changed
                 string removeNumberVersion = new String(programVersion.Where(Char.IsDigit).ToArray());
-                if (removeNumberVersion != "127")
+                if (removeNumberVersion != "128") // We check if the current application version is the same as the one on github
                 {
                     var result = MessageBox.Show("An update is available for Colony Player! Would you like to update?", "Auto Updater", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                     if (result == DialogResult.Yes)
@@ -123,10 +164,10 @@ namespace ColonyPlayer
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message); // We show an error message to the user if something went wrong
                 System.Windows.Forms.Application.Exit();
             }
-            // We try to check if Flash10t.ocx is registered or not.. (required for program + game to run)
+            // We try to check if Flash10t.ocx is registered or not. (Required for program + game to run)
             try
             {
                 using (RegistryKey Key = Registry.ClassesRoot.OpenSubKey(@"TypeLib\{57A0E746-3863-4D20-A811-950C84F1DB9B}\1.1\0\win32"))
@@ -137,7 +178,7 @@ namespace ColonyPlayer
                     }
                     else
                     {
-                        // Flash10t.ocx is not registered to registry. Adding it..
+                        // Flash10t.ocx is not registered to registry. Adding it!
                         Process proc = new Process();
                         proc.StartInfo.FileName = "regsvr32.exe";
                         proc.StartInfo.Arguments = "Flash10t.ocx";
@@ -155,7 +196,7 @@ namespace ColonyPlayer
                 InitializeComponent(); // Run main program
                 Application.AddMessageFilter(this);
             }
-            // If there's an error, it's normel on first run. Restert epplicetion.
+            // If there's an error, it's normal on first run. Restart epplication.
             catch
             {
                 this.Close();
