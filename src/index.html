@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Colony Game</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #000;
+        }
+        #flashContent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="flashContent">
+        <embed 
+            type="application/x-shockwave-flash"
+            src="https://raw.githubusercontent.com/SynthKittenDev/Colony-Revival-Project/main/ColonyV63.swf"
+            width="100%"
+            height="100%"
+            quality="high"
+            bgcolor="#000000"
+            play="true"
+            loop="true"
+            wmode="direct"
+            allowscriptaccess="always"
+            allowfullscreen="true"
+            pluginspage="http://www.adobe.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"
+        />
+    </div>
+    <script>
+        // Debug Flash availability
+        window.onload = function() {
+            const flashPlayer = document.querySelector('embed');
+            console.log('Flash element:', flashPlayer);
+            console.log('Flash ready state:', flashPlayer.readyState);
+            
+            // Try to download the SWF first
+            fetch('https://raw.githubusercontent.com/SynthKittenDev/Colony-Revival-Project/main/ColonyV63.swf')
+                .then(response => {
+                    console.log('SWF response:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error downloading SWF:', error);
+                });
+        };
+    </script>
+</body>
+</html>
