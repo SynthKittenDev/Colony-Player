@@ -28,25 +28,25 @@ if (!gotTheLock) {
 
   const setupFlashPlugin = () => {
     let pluginPath;
-    let pluginVersion = '32.0.0.371';
+    const pluginVersion = '32.0.0.371';
 
     // Get the base path depending on whether the app is packaged
     const basePath = app.isPackaged
-      ? path.join(process.resourcesPath, 'app.asar')
-      : __dirname;
+      ? path.join(process.resourcesPath, 'plugins')
+      : path.join(__dirname, 'plugins');
 
     // Determine platform-specific paths
     switch (process.platform) {
       case 'win32':
         const winArch = process.arch === 'x64' ? 'x64' : 'ia32';
-        pluginPath = path.join(basePath, 'plugins', 'win', winArch, 'pepflashplayer.dll');
+          pluginPath = path.join(basePath, 'win', winArch, 'pepflashplayer.dll');
         break;
       case 'darwin':
-        pluginPath = path.join(basePath, 'plugins', 'mac', 'PepperFlashPlayer.plugin');
+          pluginPath = path.join(basePath, 'mac', 'PepperFlashPlayer.plugin');
         break;
       case 'linux':
         const linuxArch = process.arch === 'x64' ? 'x64' : 'ia32';
-        pluginPath = path.join(basePath, 'plugins', 'linux', linuxArch, 'libpepflashplayer.so');
+          pluginPath = path.join(basePath, 'linux', linuxArch, 'libpepflashplayer.so');
         break;
       default:
         console.error('Unsupported platform:', process.platform);
@@ -137,7 +137,7 @@ if (!gotTheLock) {
     });
 
     win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-      if (permission === 'plugins') {
+      if (permission === 'flash' || permission === 'plugins') {
         callback(true);
       } else {
         callback(false);
