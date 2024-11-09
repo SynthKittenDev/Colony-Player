@@ -12,51 +12,6 @@
     "make:mac": "electron-forge make --platform darwin --arch x64",
     "make:linux": "export PATH=\"/usr/local/opt/gnu-tar/libexec/gnubin:$PATH\" && electron-forge make --platform linux --arch x64"
   },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "icon": "src/icons/icon",
-        "asar": true,
-        "executableName": "colony-revived",
-        "arch": "x64"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "colony-revived",
-            "authors": "Your Name",
-            "setupIcon": "src/icons/icon.ico"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {
-            "options": {
-              "icon": "src/icons/icon.png",
-              "maintainer": "Your Name",
-              "homepage": "https://yourwebsite.com",
-              "categories": ["Game"],
-              "arch": "amd64"
-            }
-          }
-        }
-      ],
-      "electronPackagerConfig": {
-        "arch": "x64",
-        "executableName": "colony-revived",
-        "asar": true,
-        "prune": true,
-        "overwrite": true
-      }
-    }
-  },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
   },
