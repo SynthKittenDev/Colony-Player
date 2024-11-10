@@ -4,7 +4,7 @@ module.exports = {
     asar: {
       unpackDir: 'plugins'
     },
-    executableName: "colony-revived",
+    executableName: "colony-player",
     arch: "x64",
     extraResource: [
       "./src/plugins",
@@ -16,7 +16,7 @@ module.exports = {
     {
       name: "@electron-forge/maker-squirrel",
       config: {
-        "name": "colony-revived",
+        "name": "colony-player",
         "authors": "Your Name",
         "setupIcon": "src/icons/icon.ico"
       }
