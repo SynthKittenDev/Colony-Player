@@ -1,6 +1,6 @@
 {
   "name": "colony-revived",
-  "productName": "Colony Revival",
+  "productName": "Colony Player",
   "version": "1.0.0",
   "description": "Colony Revival Project",
   "main": "src/index.js",
