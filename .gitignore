@@ -6,7 +6,10 @@ build/
 temp/
 tmp/
 *.tmp
+src/index.html
+index.html
 temp.html
+src/temp.html
 
 logs/
 *.log
@@ -50,5 +53,3 @@ commands/
 *.dll
 
 *.so
-
-src/temp.html

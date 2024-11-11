@@ -1,25 +1,99 @@
 {
   "name": "colony-player",
-  "productName": "Colony Player",
-  "version": "1.3.0",
-  "description": "Colony Revival Project",
+  "version": "1.4.0",
+  "description": "Colony Player Project",
   "main": "src/index.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "export PATH=\"/usr/local/opt/gnu-tar/libexec/gnubin:$PATH\" && electron-forge make --platform darwin --platform win32 --platform linux --arch x64",
-    "make:win": "electron-forge make --platform win32 --arch x64",
-    "make:mac": "electron-forge make --platform darwin --arch x64",
-    "make:linux": "export PATH=\"/usr/local/opt/gnu-tar/libexec/gnubin:$PATH\" && electron-forge make --platform linux --arch x64"
+    "start": "electron .",
+    "make:win": "electron-builder --win",
+    "make:mac": "electron-builder --mac",
+    "make:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.yourname.colonyplayer",
+    "productName": "Colony Player",
+    "directories": {
+      "output": "dist",
+      "buildResources": "src/static"
+    },
+    "files": [
+      "src/**/*",
+      "src/plugins",
+      "!node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "src/static",
+        "to": "static"
+      },
+      {
+        "from": "src/plugins",
+        "to": "plugins"
+      }
+    ],
+    "asarUnpack": [
+      "plugins",
+      "static"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "src/static/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "src/static/icons/icon.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "src/static/icons",
+      "category": "Game",
+      "maintainer": "Your Name",
+      "description": "Colony Player Project for Linux",
+      "desktop": {
+        "Name": "Colony Player",
+        "GenericName": "Media Player",
+        "Comment": "Play media content in style",
+        "Terminal": false,
+        "Type": "Application",
+        "Categories": "Utility;Game;"
+      }
+    },
+    "executableName": "colony-player",
+    "publish": null
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.63",
-    "@electron-forge/maker-deb": "^6.0.0-beta.63",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
-    "@electron-forge/maker-zip": "^6.0.0-beta.63",
-    "electron": "11.5.0"
+    "electron": "11.5.0",
+    "electron-builder": "^25.1.8",
+    "node-gyp": "^10.2.0"
+  },
+  "resolutions": {
+    "node-gyp": "10.2.0"
   }
 }
