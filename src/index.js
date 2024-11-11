@@ -50,7 +50,9 @@ if (!gotTheLock) {
       }
     });
 
-    win.webContents.openDevTools(); // Open developer tools for debugging
+    if (!app.isPackaged) {
+      win.webContents.openDevTools(); // Open developer tools for debugging
+    }
 
     win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
       if (permission === 'flash' || permission === 'plugins') {
