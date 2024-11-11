@@ -86,7 +86,7 @@ if (!gotTheLock) {
 
   const downloadSWF = () => {
     const swfUrl = 'https://raw.githubusercontent.com/SynthKittenDev/Colony-Revival-Project/main/ColonyV63.swf';
-    const localPath = path.join(app.isPackaged ? process.resourcesPath : __dirname, 'ColonyV63.swf');
+    const localPath = path.join(app.isPackaged ? process.resourcesPath : __dirname, 'static', 'ColonyV63.swf');
 
     if (fs.existsSync(localPath)) {
       console.log('SWF already downloaded');
@@ -113,7 +113,7 @@ if (!gotTheLock) {
 
   const createWindow = () => {
     // Get the icon path for the current platform
-    const iconPath = path.join(__dirname, 'icons', process.platform === 'win32' ? 'icon.ico' : process.platform === 'darwin' ? 'icon.icns' : 'icon.png');
+    const iconPath = path.join(__dirname, 'static', 'icons', process.platform === 'win32' ? 'icon.ico' : process.platform === 'darwin' ? 'icon.icns' : 'icon.png');
 
     win = new BrowserWindow({
       title: APP_NAME,
@@ -126,7 +126,7 @@ if (!gotTheLock) {
         plugins: true,
         nodeIntegration: true,
         contextIsolation: false,
-        webSecurity: false,
+        webSecurity: true,
         allowRunningInsecureContent: true,
         enableRemoteModule: true,
         backgroundThrottling: false,
@@ -135,6 +135,10 @@ if (!gotTheLock) {
         }
       }
     });
+
+    if (!app.isPackaged) {
+      win.webContents.openDevTools(); // Open developer tools for debugging
+    }
 
     win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
       if (permission === 'flash' || permission === 'plugins') {
@@ -153,7 +157,7 @@ if (!gotTheLock) {
       Menu.getApplicationMenu().popup(win, params.x, params.y);
     });
 
-    const localSwfPath = path.join(app.isPackaged ? process.resourcesPath : __dirname, 'ColonyV63.swf');
+    const localSwfPath = path.join(app.isPackaged ? process.resourcesPath : __dirname, 'static', 'ColonyV63.swf');
     const swfUrl = fs.existsSync(localSwfPath) 
       ? `file://${localSwfPath}`
       : 'https://raw.githubusercontent.com/SynthKittenDev/Colony-Revival-Project/main/ColonyV63.swf';
@@ -204,10 +208,15 @@ if (!gotTheLock) {
 
     win.loadFile(tempHtmlPath);
     win.center();
+    win.on('closed', () => {
+      win = null;  // Set the window object to null to avoid memory leaks
+    });
 
     win.once("page-title-updated", function (event) {
       event.preventDefault();
+      if (win && !win.isDestroyed()) {
       win.title = APP_NAME;
+      }
     });
   };
 
