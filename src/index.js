@@ -140,6 +140,31 @@ if (!gotTheLock) {
       win.webContents.openDevTools(); // Open developer tools for debugging
     }
 
+	  win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+		  const headers = {
+			  ...details.responseHeaders
+		  };
+
+		  if (headers['set-cookie']) {
+			  headers['set-cookie'] = headers['set-cookie'].map(cookie => {
+				  if (!cookie.includes('SameSite=')) {
+					  cookie = cookie + '; SameSite=None; Secure';
+				  } else {
+					  cookie = cookie.replace(/SameSite=\w+/i, 'SameSite=None');
+					  if (!cookie.includes('Secure')) {
+						  cookie = cookie + '; Secure';
+					  }
+				  }
+				  return cookie;
+			  });
+		  }
+
+		  callback({
+			  cancel: false,
+			  responseHeaders: headers
+		  });
+	  });
+    
     win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
       if (permission === 'flash' || permission === 'plugins') {
         callback(true);
