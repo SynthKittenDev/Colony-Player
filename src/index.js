@@ -106,31 +106,87 @@ if (!gotTheLock) {
 		}
 	};
 
+	const checkForSWFUpdate = (localPath, remoteUrl) => {
+		return new Promise((resolve, reject) => {
+			https.get(remoteUrl, { method: 'HEAD' }, (response) => {
+				if (response.statusCode !== 200) {
+					reject(new Error(`Failed to check remote file: ${response.statusCode}`));
+					return;
+				}
+
+				const remoteSize = parseInt(response.headers['content-length']);
+				const remoteLastModified = response.headers['last-modified'] ? new Date(response.headers['last-modified']) : null;
+				
+				if (!fs.existsSync(localPath)) {
+					console.log('Local SWF not found, need to download');
+					resolve(true);
+					return;
+				}
+				
+				const localStats = fs.statSync(localPath);
+				const localSize = localStats.size;
+				const localLastModified = localStats.mtime;
+				
+				console.log('Local SWF size:', localSize, 'bytes');
+				console.log('Remote SWF size:', remoteSize, 'bytes');
+				console.log('Local last modified:', localLastModified.toISOString());
+				if (remoteLastModified && !isNaN(remoteLastModified.getTime())) {
+					console.log('Remote last modified:', remoteLastModified.toISOString());
+				} else {
+					console.log('Remote last modified: not available or invalid');
+				}
+				
+				// Check if update is needed (different size or newer remote file if date is available)
+				const needsUpdate = localSize !== remoteSize || 
+					(remoteLastModified && !isNaN(remoteLastModified.getTime()) && remoteLastModified > localLastModified);
+				
+				if (needsUpdate) {
+					console.log('SWF update available, will download new version');
+				} else {
+					console.log('Local SWF is up to date');
+				}
+				
+				resolve(needsUpdate);
+			}).on('error', reject);
+		});
+	};
+
 	const downloadSWF = () => {
 		const swfUrl = 'https://raw.githubusercontent.com/SynthKittenDev/Colony-Revival-Project/main/ColonyV63.swf';
 		const localPath = path.join(app.isPackaged ? process.resourcesPath : __dirname, 'static', 'ColonyV63.swf');
 
-		if (fs.existsSync(localPath)) {
-			console.log('SWF already downloaded');
-			return Promise.resolve(localPath);
-		}
-
-		return new Promise((resolve, reject) => {
-			https.get(swfUrl, (response) => {
-				if (response.statusCode !== 200) {
-					reject(new Error(`Failed to download: ${response.statusCode}`));
-					return;
+		return checkForSWFUpdate(localPath, swfUrl)
+			.then(needsUpdate => {
+				if (!needsUpdate) {
+					return Promise.resolve(localPath);
 				}
+				
+				console.log('Downloading SWF update...');
+				return new Promise((resolve, reject) => {
+					https.get(swfUrl, (response) => {
+						if (response.statusCode !== 200) {
+							reject(new Error(`Failed to download: ${response.statusCode}`));
+							return;
+						}
 
-				const file = fs.createWriteStream(localPath);
-				response.pipe(file);
-				file.on('finish', () => {
-					file.close();
-					console.log('SWF downloaded successfully');
-					resolve(localPath);
+						const file = fs.createWriteStream(localPath);
+						response.pipe(file);
+						file.on('finish', () => {
+							file.close();
+							console.log('SWF downloaded successfully');
+							resolve(localPath);
+						});
+					}).on('error', reject);
 				});
-			}).on('error', reject);
-		});
+			})
+			.catch(err => {
+				console.warn('Failed to check for SWF updates, using local version if available:', err.message);
+				if (fs.existsSync(localPath)) {
+					return Promise.resolve(localPath);
+				} else {
+					return Promise.reject(new Error('No local SWF available and update check failed'));
+				}
+			});
 	};
 
 	const createWindow = () => {
