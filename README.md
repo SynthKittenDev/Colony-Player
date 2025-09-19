@@ -9,6 +9,8 @@ Colony Discord: https://discord.gg/rP8nhm8
 
 Video Tutorial: https://www.youtube.com/watch?v=Ic6ckilmTZA
 
+Colony Wiki: https://colonywiki.github.io
+
 ## Requirements
 
 To work on this project, ensure you have the correct versions of Node.js and npm installed:
