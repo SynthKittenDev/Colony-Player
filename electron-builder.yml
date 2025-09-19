@@ -1,0 +1,99 @@
+appId: com.yourname.colonyplayer
+productName: Colony Player
+executableName: colony-player
+
+directories:
+  output: dist
+  buildResources: src/static
+
+# Compression settings for optimal file size
+compression: maximum
+nodeGypRebuild: false
+npmRebuild: false
+
+# Files to include in the build
+files:
+  - "src/**/*"
+  - "!src/plugins/**/*"
+  - "!**/.DS_Store"
+  - "!**/Thumbs.db"
+  - "!**/*.map"
+  - "!**/*.log"
+  - "!**/.gitkeep"
+
+# Static resources
+extraResources:
+  - from: src/static
+    to: static
+    filter:
+      - "**/*"
+      - "!.DS_Store"
+      - "!Thumbs.db"
+
+# ASAR configuration
+asar: true
+asarUnpack:
+  - "static/ColonyV63.swf"
+
+# Windows specific configuration
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: src/static/icons/icon.ico
+  extraResources:
+    - from: src/plugins/win/${arch}
+      to: plugins/win/${arch}
+      filter:
+        - pepflashplayer.dll
+
+# NSIS installer configuration
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  packElevateHelper: false
+  differentialPackage: false
+
+# macOS specific configuration
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+  icon: src/static/icons/icon.icns
+  extraResources:
+    - from: src/plugins/mac
+      to: plugins/mac
+      filter:
+        - "PepperFlashPlayer.plugin/**/*"
+        - "!**/.DS_Store"
+
+# DMG configuration
+dmg:
+  writeUpdateInfo: false
+
+# Linux specific configuration
+linux:
+  target:
+    - AppImage
+    - deb
+  icon: src/static/icons
+  category: Game
+  maintainer: Your Name
+  description: Colony Player Project for Linux
+  extraResources:
+    - from: src/plugins/linux/${arch}
+      to: plugins/linux/${arch}
+      filter:
+        - libpepflashplayer.so
+  desktop:
+    Name: Colony Player
+    GenericName: Media Player
+    Comment: Play media content in style
+    Terminal: false
+    Type: Application
+    Categories: Utility;Game;

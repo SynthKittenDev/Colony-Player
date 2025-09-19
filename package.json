@@ -5,9 +5,12 @@
   "main": "src/index.js",
   "scripts": {
     "start": "electron .",
-    "make:win": "electron-builder --win",
+    "make:win": "electron-builder --win --x64",
+    "make:win32": "electron-builder --win --ia32",
     "make:mac": "electron-builder --mac",
-    "make:linux": "electron-builder --linux"
+    "make:linux": "electron-builder --linux --x64",
+    "make:linux32": "electron-builder --linux --ia32",
+    "clean": "rimraf dist out"
   },
   "build": {
     "appId": "com.yourname.colonyplayer",
@@ -18,41 +21,52 @@
     },
     "files": [
       "src/**/*",
-      "src/plugins",
-      "!node_modules/**/*"
+      "!src/plugins/**/*",
+      "!node_modules/**/*",
+      "!**/.DS_Store",
+      "!**/Thumbs.db"
     ],
     "extraResources": [
       {
         "from": "src/static",
-        "to": "static"
-      },
-      {
-        "from": "src/plugins",
-        "to": "plugins"
+        "to": "static",
+        "filter": [
+          "**/*",
+          "!.DS_Store"
+        ]
       }
     ],
     "asarUnpack": [
-      "plugins",
-      "static"
+      "static/ColonyV63.swf"
     ],
+    "compression": "maximum",
     "win": {
       "target": [
         {
           "target": "nsis",
           "arch": [
-            "x64",
-            "ia32"
+            "x64"
           ]
         }
       ],
-      "icon": "src/static/icons/icon.ico"
+      "icon": "src/static/icons/icon.ico",
+      "extraResources": [
+        {
+          "from": "src/plugins/win/${arch}",
+          "to": "plugins/win/${arch}",
+          "filter": [
+            "pepflashplayer.dll"
+          ]
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "perMachine": false,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "packElevateHelper": false
     },
     "mac": {
       "target": [
@@ -63,7 +77,17 @@
           ]
         }
       ],
-      "icon": "src/static/icons/icon.icns"
+      "icon": "src/static/icons/icon.icns",
+      "extraResources": [
+        {
+          "from": "src/plugins/mac",
+          "to": "plugins/mac",
+          "filter": [
+            "PepperFlashPlayer.plugin/**/*",
+            "!**/.DS_Store"
+          ]
+        }
+      ]
     },
     "linux": {
       "target": [
@@ -74,6 +98,15 @@
       "category": "Game",
       "maintainer": "Your Name",
       "description": "Colony Player Project for Linux",
+      "extraResources": [
+        {
+          "from": "src/plugins/linux/${arch}",
+          "to": "plugins/linux/${arch}",
+          "filter": [
+            "libpepflashplayer.so"
+          ]
+        }
+      ],
       "desktop": {
         "Name": "Colony Player",
         "GenericName": "Media Player",
@@ -86,12 +119,11 @@
     "executableName": "colony-player",
     "publish": null
   },
-  "dependencies": {
-  },
   "devDependencies": {
     "electron": "11.5.0",
     "electron-builder": "^25.1.8",
-    "node-gyp": "^10.2.0"
+    "node-gyp": "^10.2.0",
+    "rimraf": "^6.0.1"
   },
   "resolutions": {
     "node-gyp": "10.2.0"
